@@ -25,7 +25,7 @@ void configurarDiretorio(const char *home) {
 }
 
 void configurarCaminho(const char *home, char *out_path, size_t size){
-    printf(out_path, size, "%s/%s/%s", home, CONFIG_DIR, CONFIG_FILE);
+    snprintf(out_path, size, "%s/%s/%s", home, CONFIG_DIR, CONFIG_FILE);
 }
 
 int perguntaUsuario(pam_handle_t *pamh, const char *prompt, int echo, char *out, size_t out_size){
