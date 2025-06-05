@@ -7,11 +7,13 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <ctype.h>
 
 #define CONFIG_DIR ".pam_questions"
 #define CONFIG_FILE "config"
 #define MAX_LINE 128
 #define MAX_ANSWER 128
+int confirmacao=0;
 
 void aparar(char *str){
     size_t len = strlen(str);
@@ -84,8 +86,34 @@ int salvarArquivoPergunta(const char *filepath, const char *pergunta, const char
     return 0;
 }
 
-PAM_EXTERN int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, const char **argv){
+int confirmacaoPergunta(int confirmacao)
+{
+    char resposta[2];
+    do{
+        snprintf("Deseja utilizar autenticacao de dois fatores no login [s/n]? ");
+        scanf("%1s", &resposta);
+    
+        resposta = toupper(resposta);
+    } while (resposta != "N" || resposta != "S");
+    
+    if(strcmp(resposta, "N") == 0)
+    {
+        confirmacao = 1;
+        return confirmacao;
+    }
+    else if(strcmp(resposta, "S") == 0)
+    {
+        confirmacao = 0;
+        return confirmacao;
+    }
+}
 
+PAM_EXTERN int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, const char **argv, confirmacao){
+
+    if (confirmacao == 1){
+        return 0;
+    }
+    
     const char *username;
     struct passwd *pwd;
 
@@ -107,14 +135,17 @@ PAM_EXTERN int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, cons
 
     if (access(filepath, F_OK) != 0)
     {
-        char nova_pergunta[MAX_LINE], nova_resposta[MAX_ANSWER];
-
-        if (perguntaUsuario(pamh, "Defina uma pergunta pessoal: ", 1, nova_pergunta, sizeof(nova_pergunta)) != PAM_SUCCESS) return PAM_AUTH_ERR;
-        if (perguntaUsuario(pamh, "Resposta para a pergunta: ", 1, nova_resposta, sizeof(nova_resposta)) != PAM_SUCCESS) return PAM_AUTH_ERR;
-
-        salvarArquivoPergunta(filepath, nova_pergunta, nova_resposta);
-
-        return PAM_SUCCESS;
+        confirmacaoPergunta();
+        while(confirmacao == 0)
+        {
+            char nova_pergunta[MAX_LINE], nova_resposta[MAX_ANSWER];
+            if (perguntaUsuario(pamh, "Defina uma pergunta pessoal: ", 1, nova_pergunta, sizeof(nova_pergunta)) != PAM_SUCCESS) return PAM_AUTH_ERR;
+            if (perguntaUsuario(pamh, "Resposta para a pergunta: ", 1, nova_resposta, sizeof(nova_resposta)) != PAM_SUCCESS) return PAM_AUTH_ERR;
+            
+            salvarArquivoPergunta(filepath, nova_pergunta, nova_resposta);
+            
+            return PAM_SUCCESS;
+        }
     }
 
     if (leituraArquivo(filepath, pergunta, resposta) != 0) return PAM_AUTH_ERR;
