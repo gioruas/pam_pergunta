@@ -30,7 +30,14 @@ int salvarArquivoPergunta(const char *filepath, const char *pergunta, const char
     return 0;
 }
 
+void configurarDiretorio() {
+    char caminho[512];
+    snprintf(caminho, sizeof(caminho), "%s/%s", getenv("HOME"), CONFIG_DIR);
+    mkdir(caminho, 0700);
+}
+
 int main() {
+    configurarDiretorio();
     char pergunta[MAX_LINE], resposta[MAX_ANSWER];
     char filepath[512];
 
