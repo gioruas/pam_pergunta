@@ -15,13 +15,3 @@ sudo chmod 644 /lib/security/pam_questions.so
 
 ///////////////////////////////////////////////////////
 
-gcc -o alterar_pergunta alterar_pergunta.c
-./alterar pergunta
-
-***opc
-Você pode instalar esse utilitário em /usr/local/bin para uso geral:
-sudo cp alterar_pergunta /usr/local/bin/
-
-E ele funcionará com:
-alterar_pergunta
-
