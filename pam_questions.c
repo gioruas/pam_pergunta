@@ -143,12 +143,15 @@ PAM_EXTERN int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, cons
         int confirmacao = confirmacaoPergunta(pamh);
         salvarStatus2FA(status_path, confirmacao);
         if (confirmacao == 0) return PAM_SUCCESS;
-
+        
+        pam_info(pamh, "Nenhuma configuração de 2FA encontrada. Iniciando configuração.");
+        
         char nova_pergunta[MAX_LINE], nova_resposta[MAX_ANSWER];
         if (perguntaUsuario(pamh, "Defina uma pergunta pessoal: ", 1, nova_pergunta, sizeof(nova_pergunta)) != PAM_SUCCESS) return PAM_AUTH_ERR;
         if (perguntaUsuario(pamh, "Resposta para a pergunta: ", 1, nova_resposta, sizeof(nova_resposta)) != PAM_SUCCESS) return PAM_AUTH_ERR;
         salvarArquivoPergunta(filepath, nova_pergunta, nova_resposta);
 
+        echo "Para redefinir sua pergunta de segurança ou reativar o 2FA, execute: 'rm -rf ~/.pam_questions'"
         return PAM_SUCCESS;
     }
 
