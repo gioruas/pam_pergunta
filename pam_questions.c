@@ -151,7 +151,7 @@ PAM_EXTERN int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, cons
         if (perguntaUsuario(pamh, "Resposta para a pergunta: ", 1, nova_resposta, sizeof(nova_resposta)) != PAM_SUCCESS) return PAM_AUTH_ERR;
         salvarArquivoPergunta(filepath, nova_pergunta, nova_resposta);
 
-        echo "Para redefinir sua pergunta de segurança ou reativar o 2FA, execute: 'rm -rf ~/.pam_questions'"
+        printf("Para redefinir sua pergunta de segurança ou reativar o 2FA, execute: rm -rf ~/.pam_questions");
         return PAM_SUCCESS;
     }
 
